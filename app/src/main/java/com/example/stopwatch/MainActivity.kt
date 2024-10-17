@@ -38,8 +38,8 @@ class MainActivity : AppCompatActivity() {
         val startButton = findViewById<Button>(R.id.button1)
         startButton.setOnClickListener {
             if (!running) {
-                setBaseTime()
-                stopwatch.start()
+                setBaseTime() // установить правильное время
+                stopwatch.start() // запустить секундомер
                 running = true
             }
         }
@@ -53,7 +53,8 @@ class MainActivity : AppCompatActivity() {
 
         val resetButton = findViewById<Button>(R.id.button3)
         resetButton.setOnClickListener {
-
+            offset = 0
+            setBaseTime() // обнулить показания секундомера
         }
     }
 }
