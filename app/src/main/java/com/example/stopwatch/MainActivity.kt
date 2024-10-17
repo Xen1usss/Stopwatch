@@ -38,10 +38,10 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null) { // восстановление предыдущего состояния
             offset = savedInstanceState.getLong(OFFSET_KEY)
             running = savedInstanceState.getBoolean(RUNNING_KEY)
-                if (running) {
-                    stopwatch.base = savedInstanceState.getLong(BASE_KEY)
-                    stopwatch.start()
-                } else setBaseTime()
+            if (running) {
+                stopwatch.base = savedInstanceState.getLong(BASE_KEY)
+                stopwatch.start()
+            } else setBaseTime()
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
