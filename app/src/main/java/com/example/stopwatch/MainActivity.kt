@@ -15,16 +15,17 @@ class MainActivity : AppCompatActivity() {
     var running = false // Хронометр работает?
     var offset: Long = 0 // Базовое смещение
 
+    val OFFSET_KEY = "offset" // ключи для Bundle
+    val RUNNING_KEY = "running"
+    val BASE_KEY = "base"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+
+        stopwatch = findViewById<Chronometer>(R.id.stopwatch) // Получение ссылки на секундомер
 
         fun setBaseTime() { // Обновляет время stopwatch.base
             stopwatch.base = SystemClock.elapsedRealtime() - offset
@@ -33,7 +34,21 @@ class MainActivity : AppCompatActivity() {
         fun saveOffset() { // Сохраняет offset
             offset = SystemClock.elapsedRealtime() - stopwatch.base
         }
-        stopwatch = findViewById<Chronometer>(R.id.stopwatch) // Получение ссылки на секундомер
+
+        if (savedInstanceState != null) { // восстановление предыдущего состояния
+            offset = savedInstanceState.getLong(OFFSET_KEY)
+            running = savedInstanceState.getBoolean(RUNNING_KEY)
+                if (running) {
+                    stopwatch.base = savedInstanceState.getLong(BASE_KEY)
+                    stopwatch.start()
+                } else setBaseTime()
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         val startButton = findViewById<Button>(R.id.button1)
         startButton.setOnClickListener {
@@ -56,5 +71,12 @@ class MainActivity : AppCompatActivity() {
             offset = 0
             setBaseTime() // обнулить показания секундомера
         }
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) { // сохранение значений на случай перезапуска активити
+        savedInstanceState.putLong(OFFSET_KEY, offset)
+        savedInstanceState.putBoolean(RUNNING_KEY, running)
+        savedInstanceState.putLong(BASE_KEY, stopwatch.base)
+        super.onSaveInstanceState(savedInstanceState)
     }
 }
