@@ -65,12 +65,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun setBaseTime() { // Обновляет время stopwatch.base
-        stopwatch.base = SystemClock.elapsedRealtime() - offset
+    override fun onPause() {
+        super.onPause()
+        if (running) {
+            saveOffset()
+            stopwatch.stop()
+        }
     }
 
-    fun saveOffset() { // Сохраняет offset
-        offset = SystemClock.elapsedRealtime() - stopwatch.base
+    override fun onResume() {
+        super.onResume()
+        if (running) {
+            setBaseTime()
+            stopwatch.start()
+            offset = 0
+        }
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) { // сохранение значений на случай перезапуска активити
@@ -80,21 +89,11 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(savedInstanceState)
     }
 
-    override fun onStop() {
-        super.onStop()
-        saveOffset()
-        if (running) {
-            saveOffset()
-            stopwatch.stop()
-        }
+    fun setBaseTime() { // Обновляет время stopwatch.base
+        stopwatch.base = SystemClock.elapsedRealtime() - offset
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        if (running) {
-            setBaseTime()
-            stopwatch.start()
-            offset = 0
-        }
+    fun saveOffset() { // Сохраняет offset
+        offset = SystemClock.elapsedRealtime() - stopwatch.base
     }
 }
