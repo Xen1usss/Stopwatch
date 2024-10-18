@@ -27,14 +27,6 @@ class MainActivity : AppCompatActivity() {
 
         stopwatch = findViewById<Chronometer>(R.id.stopwatch) // Получение ссылки на секундомер
 
-        fun setBaseTime() { // Обновляет время stopwatch.base
-            stopwatch.base = SystemClock.elapsedRealtime() - offset
-        }
-
-        fun saveOffset() { // Сохраняет offset
-            offset = SystemClock.elapsedRealtime() - stopwatch.base
-        }
-
         if (savedInstanceState != null) { // восстановление предыдущего состояния
             offset = savedInstanceState.getLong(OFFSET_KEY)
             running = savedInstanceState.getBoolean(RUNNING_KEY)
@@ -73,10 +65,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun setBaseTime() { // Обновляет время stopwatch.base
+        stopwatch.base = SystemClock.elapsedRealtime() - offset
+    }
+
+    fun saveOffset() { // Сохраняет offset
+        offset = SystemClock.elapsedRealtime() - stopwatch.base
+    }
+
     override fun onSaveInstanceState(savedInstanceState: Bundle) { // сохранение значений на случай перезапуска активити
         savedInstanceState.putLong(OFFSET_KEY, offset)
         savedInstanceState.putBoolean(RUNNING_KEY, running)
         savedInstanceState.putLong(BASE_KEY, stopwatch.base)
         super.onSaveInstanceState(savedInstanceState)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        saveOffset()
+        if (running) {
+            saveOffset()
+            stopwatch.stop()
+        }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        if (running) {
+            setBaseTime()
+            stopwatch.start()
+            offset = 0
+        }
     }
 }
