@@ -25,6 +25,12 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
         stopwatch = findViewById<Chronometer>(R.id.stopwatch) // Получение ссылки на секундомер
 
         if (savedInstanceState != null) { // восстановление предыдущего состояния
@@ -34,12 +40,6 @@ class MainActivity : AppCompatActivity() {
                 stopwatch.base = savedInstanceState.getLong(BASE_KEY)
                 stopwatch.start()
             } else setBaseTime()
-        }
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
         }
 
         val startButton = findViewById<Button>(R.id.button1)
