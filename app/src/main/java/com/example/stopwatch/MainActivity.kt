@@ -8,9 +8,11 @@ import androidx.core.view.WindowInsetsCompat
 import android.os.SystemClock
 import android.widget.Button
 import android.widget.Chronometer
+import com.example.stopwatch.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding // добавляет свойство binding
     lateinit var stopwatch: Chronometer // Хронометр
     var running = false // Хронометр работает?
     var offset: Long = 0 // Базовое смещение
@@ -23,8 +25,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-
+        binding = ActivityMainBinding.inflate(layoutInflater) // объявление свойства
+        val view = binding.root // view присваивается корневое представление
+        setContentView(view) // корневое представление передается setContentView
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -37,29 +40,26 @@ class MainActivity : AppCompatActivity() {
             offset = savedInstanceState.getLong(OFFSET_KEY)
             running = savedInstanceState.getBoolean(RUNNING_KEY)
             if (running) {
-                stopwatch.base = savedInstanceState.getLong(BASE_KEY)
-                stopwatch.start()
+                binding.stopwatch.base = savedInstanceState.getLong(BASE_KEY)
+                binding.stopwatch.start()
             } else setBaseTime()
         }
 
-        val startButton = findViewById<Button>(R.id.button1)
-        startButton.setOnClickListener {
+        binding.button1.setOnClickListener {
             if (!running) {
                 setBaseTime() // установить правильное время
-                stopwatch.start() // запустить секундомер
+                binding.stopwatch.start() // запустить секундомер
                 running = true
             }
         }
 
-        val pauseButton = findViewById<Button>(R.id.button2)
-        pauseButton.setOnClickListener {
+        binding.button2.setOnClickListener {
             saveOffset() // сохранить значение на секундомере
-            stopwatch.stop() // остановить его
+            binding.stopwatch.stop() // остановить его
             running = false
         }
 
-        val resetButton = findViewById<Button>(R.id.button3)
-        resetButton.setOnClickListener {
+        binding.button3.setOnClickListener {
             offset = 0
             setBaseTime() // обнулить показания секундомера
         }
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         if (running) {
             saveOffset()
-            stopwatch.stop()
+            binding.stopwatch.stop()
         }
     }
 
@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         if (running) {
             setBaseTime()
-            stopwatch.start()
+            binding.stopwatch.start()
             offset = 0
         }
     }
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(savedInstanceState: Bundle) { // сохранение значений на случай перезапуска активити
         savedInstanceState.putLong(OFFSET_KEY, offset)
         savedInstanceState.putBoolean(RUNNING_KEY, running)
-        savedInstanceState.putLong(BASE_KEY, stopwatch.base)
+        savedInstanceState.putLong(BASE_KEY, binding.stopwatch.base)
         super.onSaveInstanceState(savedInstanceState)
     }
 
@@ -94,6 +94,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun saveOffset() { // Сохраняет offset
-        offset = SystemClock.elapsedRealtime() - stopwatch.base
+        offset = SystemClock.elapsedRealtime() - binding.stopwatch.base
     }
 }
